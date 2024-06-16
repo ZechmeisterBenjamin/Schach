@@ -124,21 +124,21 @@ namespace Schach
             FillChessBoard();
             FillCurrentChessBoard();
         }
-        private bool IsCheck(Move move)
-        {
-            int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.endField)));
-            int indexColumn = chessBoard[indexRow].IndexOf(move.endField);
-            List<Move> moves = GetMoves(IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]));
-            for(int i = 0; i < moves.Count; i++)
-            {
-                indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(moves[i].endField)));
-                indexColumn = chessBoard[indexRow].IndexOf(moves[i].endField);
-                if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]) != null)
-                    if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).piece == ChessPiece.King)
-                        return true;
-            }
-            return false;
-        }
+        //private bool IsCheck(Move move)
+        //{
+        //    int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.endField)));
+        //    int indexColumn = chessBoard[indexRow].IndexOf(move.endField);
+        //    List<Move> moves = GetMoves(IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]));
+        //    for (int i = 0; i < moves.Count; i++)
+        //    {
+        //        indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(moves[i].endField)));
+        //        indexColumn = chessBoard[indexRow].IndexOf(moves[i].endField);
+        //        if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]) != null)
+        //            if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).piece == ChessPiece.King)
+        //                return true;
+        //    }
+        //    return false;
+        //}
         private void SelectedChessField(object sender)
         {
             Border border = (Border)sender;
@@ -172,9 +172,6 @@ namespace Schach
                         if(currentMove.startField != currentMove.endField)
                         {
                             MoveChessPiece(sender);
-                            if (IsCheck(currentMove))
-                                MessageBox.Show("CHECK");
-                            selectedField = "";
                             if (currentTurn == ChessColor.White)
                                 currentTurn = ChessColor.Black;
                             else if (currentTurn == ChessColor.Black)
