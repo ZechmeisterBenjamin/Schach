@@ -124,21 +124,28 @@ namespace Schach
             FillChessBoard();
             FillCurrentChessBoard();
         }
-        //private bool IsCheck(Move move)
-        //{
-        //    int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.endField)));
-        //    int indexColumn = chessBoard[indexRow].IndexOf(move.endField);
-        //    List<Move> moves = GetMoves(IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]));
-        //    for (int i = 0; i < moves.Count; i++)
-        //    {
-        //        indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(moves[i].endField)));
-        //        indexColumn = chessBoard[indexRow].IndexOf(moves[i].endField);
-        //        if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]) != null)
-        //            if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).piece == ChessPiece.King)
-        //                return true;
-        //    }
-        //    return false;
-        //}
+        private bool IsCheck(Move move)
+        {
+            //int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.endField)));
+            //int indexColumn = chessBoard[indexRow].IndexOf(move.endField);
+            //var children = GetAllChildren(ChessBoard);
+            //List<string> chessFieldsName = new List<string>();
+            //List<Border> chessFields = new List<Border>();
+            //List<Move> moves = new List<Move>();
+            //foreach (var child in children)
+            //    if (child is Border border)
+            //    {
+            //        chessFieldsName.Add(border.Name);
+            //        chessFields.Add(border);
+            //    }
+            //int chessFieldIndex = chessFieldsName.IndexOf(move.endField);
+            //moves = GetMoves(chessFields[chessFieldIndex]);
+            //foreach(var m in moves)
+            //{
+            //    MessageBox.Show(m.endField);
+            //}
+            return false;
+        }
         private void SelectedChessField(object sender)
         {
             Border border = (Border)sender;
@@ -172,6 +179,7 @@ namespace Schach
                         if(currentMove.startField != currentMove.endField)
                         {
                             MoveChessPiece(sender);
+                            bool check = IsCheck(currentMove);
                             if (currentTurn == ChessColor.White)
                                 currentTurn = ChessColor.Black;
                             else if (currentTurn == ChessColor.Black)
@@ -189,353 +197,6 @@ namespace Schach
             int indexOldRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(selectedField)));
             int indexOldColumn = chessBoard[indexOldRow].IndexOf(selectedField);
             Piece piece = IdentifyChessPiece(sender);
-            switch (piece.piece)
-            {
-                case (ChessPiece.Pawn):
-                    switch (piece.color)
-                    {
-                        case ChessColor.White:
-                            if (indexRow + 1 < currentChessBoard.Count && currentChessBoard[indexRow + 1][indexColumn] == "")
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn]));
-                                if (indexRow == 1 && currentChessBoard[indexRow + 2][indexColumn] == "")
-                                    moves.Add(new Move(selectedField, chessBoard[indexRow + 2][indexColumn]));
-                            }
-                            if(indexRow + 1 < currentChessBoard.Count && indexColumn + 1 < currentChessBoard.Count)
-                                if(currentChessBoard[indexRow + 1][indexColumn + 1] != "" && IdentifyChessPiece(currentChessBoard[indexRow+1][indexColumn+1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                                moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn + 1]));
-                            if(indexRow + 1 < currentChessBoard.Count && indexColumn - 1 >= 0)
-                                if(currentChessBoard[indexRow + 1][indexColumn - 1] != "" && IdentifyChessPiece(currentChessBoard[indexRow+1][indexColumn-1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                                moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn - 1]));
-                            break;
-                        case ChessColor.Black:
-                            if (indexRow - 1 >= 0 && currentChessBoard[indexRow - 1][indexColumn] == "")
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn]));
-                                if (indexRow == 6 && currentChessBoard[indexRow - 2][indexColumn] == "")
-                                    moves.Add(new Move(selectedField, chessBoard[indexRow - 2][indexColumn]));
-                            }
-                            if (indexRow - 1 >= 0 && indexColumn + 1 < currentChessBoard.Count)
-                                if (currentChessBoard[indexRow - 1][indexColumn + 1] != "" && IdentifyChessPiece(currentChessBoard[indexRow-1][indexColumn+1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                                {
-                                    moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn + 1]));
-                                    pieceInWay = true;
-                                }
-                            if (indexRow - 1 >= 0 && indexColumn - 1 >= 0)
-                                if (currentChessBoard[indexRow - 1][indexColumn - 1] != "" && IdentifyChessPiece(currentChessBoard[indexRow-1][indexColumn-1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                                {
-                                    moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn - 1]));
-                                    pieceInWay = true;
-                                }
-                            break;
-                    }
-                    break;
-                case ChessPiece.Rook:
-                    for(int i = indexRow+1; i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[i][indexColumn] == "")
-                            moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                        else if(IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if(IdentifyChessPiece(currentChessBoard[i][indexColumn]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for(int i = indexColumn+1; i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow][i] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[indexRow][i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for(int i = indexRow-1; i >= 0 && !pieceInWay; i--)
-                    {
-                        if (currentChessBoard[i][indexColumn] == "")
-                            moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[i][indexColumn]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for(int i = indexColumn-1; i >= 0 && !pieceInWay; i--)
-                    {
-                        if (currentChessBoard[indexRow][i] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[indexRow][i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    break;
-                case ChessPiece.Bishop:
-                    for(int i = 1; indexRow+i < currentChessBoard.Count && indexColumn + i < currentChessBoard.Count && !pieceInWay;i++)
-                    {
-                        if (currentChessBoard[indexRow + i][indexColumn + i] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn + i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow + i][indexColumn + i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn + i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for(int i = 1; indexRow-i >= 0 && indexColumn - i >= 0 && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow - i][indexColumn - i] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn - i]));
-                        else if(IdentifyChessPiece(currentChessBoard[indexRow - i][indexColumn - i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn - i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for(int i = 1; indexRow+i < currentChessBoard.Count && indexColumn - i >= 0 && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow + i][indexColumn - i] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn - i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow + i][indexColumn - i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn - i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for(int i = 1; indexRow-i >= 0 && indexColumn + i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow - i][indexColumn + i] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn + i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow - i][indexColumn + i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn + i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    break;
-                case ChessPiece.Knight:
-                    if(indexRow + 2 < currentChessBoard.Count && indexColumn + 1 < currentChessBoard.Count && currentChessBoard[indexRow + 2][indexColumn + 1] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 2][indexColumn + 1]));
-                    else if(indexRow + 2 < currentChessBoard.Count && indexColumn + 1 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow + 2][indexColumn + 1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 2][indexColumn + 1]));
-                    if (indexRow + 2 < currentChessBoard.Count && indexColumn - 1 >= 0 && currentChessBoard[indexRow + 2][indexColumn - 1] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 2][indexColumn - 1]));
-                    else if(indexRow + 2 < currentChessBoard.Count && indexColumn - 1 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow + 2][indexColumn - 1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 2][indexColumn - 1]));
-                    if (indexRow - 2 >= 0 && indexColumn + 1 < currentChessBoard.Count && currentChessBoard[indexRow - 2][indexColumn + 1] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 2][indexColumn + 1]));
-                    else if(indexRow - 2 >= 0 && indexColumn + 1 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow - 2][indexColumn + 1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 2][indexColumn + 1]));
-                    if (indexRow - 2 >= 0 && indexColumn - 1 >= 0 && currentChessBoard[indexRow - 2][indexColumn - 1] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 2][indexColumn - 1]));
-                    else if(indexRow - 2 >= 0 && indexColumn - 1 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow - 2][indexColumn - 1]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 2][indexColumn - 1]));
-                    if (indexRow + 1 < currentChessBoard.Count && indexColumn + 2 < currentChessBoard.Count && currentChessBoard[indexRow + 1][indexColumn + 2] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn + 2]));
-                    else if(indexRow + 1 < currentChessBoard.Count && indexColumn + 2 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow + 1][indexColumn + 2]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn + 2]));
-                    if (indexRow + 1 < currentChessBoard.Count && indexColumn - 2 >= 0 && currentChessBoard[indexRow + 1][indexColumn - 2] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn - 2]));
-                    else if(indexRow + 1 < currentChessBoard.Count && indexColumn - 2 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow + 1][indexColumn - 2]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn - 2]));
-                    if (indexRow - 1 >= 0 && indexColumn + 2 < currentChessBoard.Count && currentChessBoard[indexRow - 1][indexColumn + 2] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn + 2]));
-                    else if(indexRow - 1 >= 0 && indexColumn + 2 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow - 1][indexColumn + 2]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn + 2]));
-                    if (indexRow - 1 >= 0 && indexColumn - 2 >= 0 && currentChessBoard[indexRow - 1][indexColumn - 2] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn - 2]));
-                    else if(indexRow - 1 >= 0 && indexColumn - 2 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow - 1][indexColumn - 2]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn - 2]));
-                    break;
-                case ChessPiece.Queen:
-                    for (int i = 1; indexRow + i < currentChessBoard.Count && indexColumn + i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow + i][indexColumn + i] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn + i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow + i][indexColumn + i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn + i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = 1; indexRow - i >= 0 && indexColumn - i >= 0 && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow - i][indexColumn - i] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn - i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow - i][indexColumn - i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn - i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = 1; indexRow + i < currentChessBoard.Count && indexColumn - i >= 0 && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow + i][indexColumn - i] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn - i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow + i][indexColumn - i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow + i][indexColumn - i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = 1; indexRow - i >= 0 && indexColumn + i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow - i][indexColumn + i] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn + i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexRow - i][indexColumn + i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                        {
-                            moves.Add(new Move(selectedField, chessBoard[indexRow - i][indexColumn + i]));
-                            pieceInWay = true;
-                        }
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = indexRow + 1; i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[i][indexColumn] == "")
-                            moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[i][indexColumn]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = indexColumn + 1; i < currentChessBoard.Count && !pieceInWay; i++)
-                    {
-                        if (currentChessBoard[indexRow][i] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[indexRow][i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = indexRow - 1; i >= 0 && !pieceInWay; i--)
-                    {
-                        if (currentChessBoard[i][indexColumn] == "")
-                            moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[i][indexColumn]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[i][indexColumn]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    pieceInWay = false;
-                    for (int i = indexColumn - 1; i >= 0 && !pieceInWay; i--)
-                    {
-                        if (currentChessBoard[indexRow][i] == "")
-                            moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                        else if (IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]) != null)
-                            if (IdentifyChessPiece(currentChessBoard[indexRow][i]).color != IdentifyChessPiece(currentChessBoard[indexOldRow][indexOldColumn]).color)
-                            {
-                                moves.Add(new Move(selectedField, chessBoard[indexRow][i]));
-                                pieceInWay = true;
-                            }
-                            else pieceInWay = true;
-                        else
-                            pieceInWay = true;
-                    }
-                    break;
-                case ChessPiece.King:
-                    if(indexRow + 1 < currentChessBoard.Count && currentChessBoard[indexRow + 1][indexColumn] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn]));
-                    else if(indexRow + 1 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow + 1][indexColumn]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn]));
-                    if (indexColumn + 1 < currentChessBoard.Count && currentChessBoard[indexRow][indexColumn + 1] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow][indexColumn + 1]));
-                    else if (indexColumn + 1 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow][indexColumn + 1]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow][indexColumn + 1]));
-                    if (indexRow - 1 >= 0 && currentChessBoard[indexRow - 1][indexColumn] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn]));
-                    else if (indexRow - 1 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow - 1][indexColumn]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn]));
-                    if (indexColumn - 1 >= 0 && currentChessBoard[indexRow][indexColumn - 1] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow][indexColumn - 1]));
-                    else if (indexColumn - 1 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow][indexColumn - 1]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow][indexColumn - 1]));
-                    if (indexRow + 1 < currentChessBoard.Count && indexColumn + 1 < currentChessBoard.Count && currentChessBoard[indexRow + 1][indexColumn + 1] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn + 1]));
-                    else if (indexRow + 1 < currentChessBoard.Count && indexColumn + 1 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow + 1][indexColumn + 1]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn + 1]));
-                    if (indexRow - 1 >= 0 && indexColumn - 1 >= 0 && currentChessBoard[indexRow - 1][indexColumn - 1] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn - 1]));
-                    else if (indexRow - 1 >= 0 && indexColumn - 1 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow - 1][indexColumn - 1]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn - 1]));
-                    if (indexRow + 1 < currentChessBoard.Count && indexColumn - 1 >= 0 && currentChessBoard[indexRow + 1][indexColumn - 1] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn - 1]));
-                    else if (indexRow + 1 < currentChessBoard.Count && indexColumn - 1 >= 0 && IdentifyChessPiece(currentChessBoard[indexRow + 1][indexColumn - 1]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow + 1][indexColumn - 1]));
-                    if (indexRow - 1 >= 0 && indexColumn + 1 < currentChessBoard.Count && currentChessBoard[indexRow - 1][indexColumn + 1] == "")
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn + 1]));
-                    else if (indexRow - 1 >= 0 && indexColumn + 1 < currentChessBoard.Count && IdentifyChessPiece(currentChessBoard[indexRow - 1][indexColumn + 1]).color != IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).color)
-                        moves.Add(new Move(selectedField, chessBoard[indexRow - 1][indexColumn + 1]));
-                    break;
-            }
-            return moves;
-        }
-        private List<Move> GetMoves(Piece piece)
-        {
-            bool pieceInWay = false;
-            List<Move> moves = new List<Move>();
-            int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(selectedField)));
-            int indexColumn = chessBoard[indexRow].IndexOf(selectedField);
-            int indexOldRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(selectedField)));
-            int indexOldColumn = chessBoard[indexOldRow].IndexOf(selectedField);
             switch (piece.piece)
             {
                 case (ChessPiece.Pawn):
@@ -1043,6 +704,7 @@ namespace Schach
             SelectedChessField(sender);
         }
     }
+    #region Classes
     class Move
     {
         public string startField;
@@ -1063,4 +725,5 @@ namespace Schach
             this.color = color;
         }
     }
+    #endregion
 }
