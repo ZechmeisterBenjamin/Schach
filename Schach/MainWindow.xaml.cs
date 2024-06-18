@@ -26,6 +26,7 @@ namespace Schach
     {
         List<List<string>> chessBoard = new List<List<string>>();
         List<List<string>> currentChessBoard = new List<List<string>>();
+        List<List<string>> originalChessBoard = new List<List<string>>();
         Dictionary<string, Brush> borderColors = new Dictionary<string, Brush>
         {
             { "A8", new SolidColorBrush(Colors.Beige) },
@@ -222,6 +223,52 @@ namespace Schach
             selectedField = oldSelectedField;
             return false;
         }
+        private bool IsCheckmate(Move move)
+        {
+            var children = GetAllChildren(ChessBoard);
+            List<string> chessFieldsName = new List<string>();
+            List<object> chessFields = new List<object>();
+            List<Piece> pieces = new List<Piece>();
+            Piece checkableKing = new Piece(ChessPiece.King, ChessColor.Black);
+            List<List<Move>> moves = new List<List<Move>>();
+            string oldSelectedField = selectedField;
+            foreach (var child in children)
+                if (child is Border border)
+                {
+                    chessFieldsName.Add(border.Name);
+                    chessFields.Add(border);
+                }
+            int startIndex = chessFieldsName.IndexOf(move.endField);
+            Piece startPiece = IdentifyChessPiece(chessFields[startIndex]);
+            if (startPiece.color == ChessColor.Black)
+                checkableKing = new Piece(ChessPiece.King, ChessColor.White);
+            for (int i = 0; i < chessFields.Count; i++)
+            {
+                Piece currentPiece = IdentifyChessPiece(chessFields[i]);
+                if (currentPiece != null)
+                {
+                    if (currentPiece.color.ToString() != startPiece.color.ToString())
+                    {
+                        pieces.Add(currentPiece);
+                        selectedField = chessFieldsName[i];
+                        moves.Add(GetMoves(chessFields[i]));
+                    }
+                }
+            }
+            for (int i = 0; i < moves.Count; i++)
+            {
+                for (int j = 0; j < moves[i].Count; j++)
+                {
+                    int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(moves[i][j].endField)));
+                    int indexColumn = chessBoard[indexRow].IndexOf(moves[i][j].endField);
+                    if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]) != null)
+                        if (IsCheck(moves[i][j]))
+                                return true;
+                }
+            }
+            selectedField = oldSelectedField;
+            return false;
+        }
         private void SelectedChessField(object sender)
         {
             Border border = (Border)sender;
@@ -259,8 +306,10 @@ namespace Schach
                             MoveChessPiece(sender);
                             bool check = IsCheck(currentMove);
                             bool isInCheck = IsChecked(currentMove);
+                            bool isCheckMate = IsCheckmate(currentMove);
                             if (isInCheck)
                                 ReverseMove(currentMove);
+                            if (isCheckMate)
                                 MessageBox.Show("CHECKMATE");
                             if (currentTurn == ChessColor.White)
                             {
@@ -285,6 +334,10 @@ namespace Schach
                     }
                 }
             }
+        }
+        private void ResetBoard()
+        {
+            for(int i = 0; i < )
         }
         private void ReverseMove(Move move)
         {
@@ -793,8 +846,6 @@ namespace Schach
         }
         private void RefreshBoard()
         {
-            int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(selectedField)));
-            int indexColumn = chessBoard[indexRow].IndexOf(selectedField);
             List<DependencyObject> chessBoardBorders = GetAllChildren(ChessBoard);
             Border selectedBorder = (Border)chessBoardBorders.Find(DependencyObject => DependencyObject is Border border && border.Name == selectedField);
             selectedBorder.Background = borderColors[selectedField];
