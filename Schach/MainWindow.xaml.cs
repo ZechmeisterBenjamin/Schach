@@ -24,9 +24,12 @@ namespace Schach
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Chess Boards
         List<List<string>> chessBoard = new List<List<string>>();
         List<List<string>> currentChessBoard = new List<List<string>>();
         List<List<string>> originalChessBoard = new List<List<string>>();
+        #endregion
+        #region Dictionaries
         Dictionary<string, Brush> borderColors = new Dictionary<string, Brush>
         {
             { "A8", new SolidColorBrush(Colors.Beige) },
@@ -106,11 +109,14 @@ namespace Schach
              { ChessColor.White, false },
              { ChessColor.Black, false },
         };
+        #endregion
+        #region Dynamic variables
         List<Move> moves = new List<Move>();
         ChessColor currentTurn = ChessColor.White;
-
         private string selectedField = "";
         private int selectedCounter = 0;
+        #endregion
+        #region enums
         public enum ChessColor
         {
             White,
@@ -125,6 +131,7 @@ namespace Schach
             Queen,
             King
         }
+        #endregion
         public MainWindow()
         {
             InitializeComponent();
@@ -308,15 +315,19 @@ namespace Schach
                             bool isInCheck = IsChecked(currentMove);
                             bool isCheckMate = IsCheckmate(currentMove);
                             if (isInCheck)
+                            {
                                 ReverseMove(currentMove);
+                            }
                             if (isCheckMate)
-                                MessageBox.Show("CHECKMATE");
+                            {
+                                ResetChessBoard();
+                                MessageBox.Show(currentTurn + " won!");
+                            }
                             if (currentTurn == ChessColor.White)
                             {
                                 if(check && !isInCheck)
                                 {
                                     this.isInCheck[ChessColor.Black] = true;
-                                    MessageBox.Show("Check");
                                 }
                                 currentTurn = ChessColor.Black;
                             }
@@ -325,8 +336,6 @@ namespace Schach
                                 if (check && !isInCheck)
                                 {
                                     this.isInCheck[ChessColor.White] = true;
-                                    if (this.isInCheck[currentTurn])
-                                        MessageBox.Show("Check");
                                 }
                                 currentTurn = ChessColor.White;
                             }
@@ -335,9 +344,31 @@ namespace Schach
                 }
             }
         }
-        private void ResetBoard()
+        private void ResetChessBoard()
         {
-            for(int i = 0; i < )
+            List<DependencyObject> chessBoardBorders = GetAllChildren(ChessBoard);
+            Border selectedBorder = (Border)chessBoardBorders.Find(DependencyObject => DependencyObject is Border border && border.Name == selectedField);
+            selectedBorder.Background = borderColors[selectedField];
+            selectedField = "";
+            selectedCounter = 0;
+            for (int i = 0; i < originalChessBoard.Count; i++)
+            {
+                for (int j = 0; j < originalChessBoard[i].Count; j++)
+                {
+                    List<DependencyObject> children = GetAllChildren(ChessBoard);
+                    for (int k = 0; k < children.Count; k++)
+                    {
+                        if (children[k] is Border border)
+                        {
+                            if (border.Name == chessBoard[i][j])
+                            {
+                                TextBlock textBlock = (TextBlock)border.Child;
+                                textBlock.Text = originalChessBoard[i][j];
+                            }
+                        }
+                    }
+                }
+            }
         }
         private void ReverseMove(Move move)
         {
@@ -812,7 +843,10 @@ namespace Schach
             for(int i = board.Split(';').Length -1; i >= 0; i--)
             {
                 if (board.Split(';')[i].Split(',').Length == 8)
-                 currentChessBoard.Add(board.Split(';')[i].Split(',').ToList());
+                {
+                    currentChessBoard.Add(board.Split(';')[i].Split(',').ToList());
+                    originalChessBoard.Add(board.Split(';')[i].Split(',').ToList());
+                }
             }
         }
         private List<DependencyObject> GetAllChildren(DependencyObject parent)
