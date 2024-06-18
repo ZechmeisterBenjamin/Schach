@@ -384,6 +384,7 @@ namespace Schach
                     }
                 }
             }
+            FillCurrentChessBoard();
             currentTurn = ChessColor.White;
         }
         private void ReverseMove(Move move)
@@ -830,6 +831,7 @@ namespace Schach
         }
         private void FillChessBoard()
         {
+            chessBoard.Clear();
             chessBoard.Add(new List<string> { "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1" });
             chessBoard.Add(new List<string> { "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2" });
             chessBoard.Add(new List<string> { "A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3" });
@@ -841,6 +843,7 @@ namespace Schach
         }
         private void FillCurrentChessBoard()
         {
+            currentChessBoard.Clear();
             string board = "";
             List<DependencyObject> children = GetAllChildren(ChessBoard);
             for(int i = 0; i < children.Count; i++)
