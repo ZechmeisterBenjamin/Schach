@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,13 +25,14 @@ namespace Schach
     /// </summary>
     public partial class MainWindow : Window
     {
+        ObservableCollection<Notation> notations = new ObservableCollection<Notation>();
         #region Chess Boards
         List<List<string>> chessBoard = new List<List<string>>();
         List<List<string>> currentChessBoard = new List<List<string>>();
         List<List<string>> originalChessBoard = new List<List<string>>();
         #endregion
         #region Dictionaries
-        Dictionary<string, Brush> borderColors = new Dictionary<string, Brush>
+        public Dictionary<string, Brush> borderColors = new Dictionary<string, Brush>
         {
             { "A8", new SolidColorBrush(Colors.Beige) },
             { "B8", new SolidColorBrush(Colors.SaddleBrown) },
@@ -104,14 +106,23 @@ namespace Schach
             { "G1", new SolidColorBrush(Colors.SaddleBrown) },
             { "H1", new SolidColorBrush(Colors.Beige) }
         };
-        Dictionary<ChessColor, bool> isInCheck = new Dictionary<ChessColor, bool>
+        public Dictionary<ChessColor, bool> isInCheck = new Dictionary<ChessColor, bool>
         {
              { ChessColor.White, false },
              { ChessColor.Black, false },
         };
+        public Dictionary<ChessPiece, string> ChessPieceAbbr = new Dictionary<ChessPiece, string>
+        {
+            {ChessPiece.Pawn, ""},
+            {ChessPiece.Knight, "N"},
+            {ChessPiece.Bishop, "B"},
+            {ChessPiece.Queen, "Q"},
+            {ChessPiece.King, "K"},
+            {ChessPiece.Rook, "R"},
+        };
         #endregion
         #region Dynamic variables
-        List<Move> moves = new List<Move>();
+        List<Move> possibleMoves = new List<Move>();
         ChessColor currentTurn = ChessColor.White;
         private string selectedField = "";
         private int selectedCounter = 0;
@@ -137,6 +148,7 @@ namespace Schach
             InitializeComponent();
             FillChessBoard();
             FillCurrentChessBoard();
+            Notations_lv.ItemsSource = notations;
         }
         private bool IsCheck(Move move)
         {
@@ -298,15 +310,15 @@ namespace Schach
                     border.Background = Brushes.Red;
                     selectedCounter++;
                     selectedField = border.Name;
-                    moves = GetMoves(sender);
+                    possibleMoves = GetMoves(sender);
                 }
             }
             else
             {
-                for(int i = 0; i < moves.Count; i++)
+                for(int i = 0; i < possibleMoves.Count; i++)
                 {
 
-                    if(moves[i].endField == currentMove.endField)
+                    if(possibleMoves[i].endField == currentMove.endField)
                     {
                         if(currentMove.startField != currentMove.endField)
                         {
@@ -318,9 +330,12 @@ namespace Schach
                             {
                                 ReverseMove(currentMove);
                             }
+                            if(!isInCheck && selectedCounter == 0)
+                                notations.Add(new Notation(IdentifyChessPiece(textBlock.Text).piece, currentMove.startField, currentMove.endField, false, check, isCheckMate, false, false));
                             if (isCheckMate)
                             {
                                 ResetChessBoard();
+                                //notations = new ObservableCollection<Notation>();
                                 MessageBox.Show(currentTurn + " won!");
                             }
                             if (currentTurn == ChessColor.White)
@@ -369,6 +384,7 @@ namespace Schach
                     }
                 }
             }
+            currentTurn = ChessColor.White;
         }
         private void ReverseMove(Move move)
         {
@@ -927,6 +943,54 @@ namespace Schach
         {
             this.piece = piece;
             this.color = color;
+        }
+    }
+    class Notation
+    {
+        Dictionary<ChessPiece, string> ChessPieceAbbr = new Dictionary<ChessPiece, string>
+        {
+            {ChessPiece.Pawn, ""},
+            {ChessPiece.Knight, "N"},
+            {ChessPiece.Bishop, "B"},
+            {ChessPiece.Queen, "Q"},
+            {ChessPiece.King, "K"},
+            {ChessPiece.Rook, "R"},
+        };
+        public ChessPiece Piece { get; set; }
+        public string StartField { get; set; }
+        public string EndField { get; set; }
+        public bool Capture { get; set; }
+        public bool Check { get; set; }
+        public bool Checkmate {  get; set; }
+        public bool ShortCastle {  get; set; }
+        public bool LongCastle { get; set; }
+        public Notation(ChessPiece piece, string startField, string endField, bool capture, bool check, bool checkmate, bool shortCastle, bool longCastle)
+        {
+            Piece = piece;
+            StartField = startField;
+            EndField = endField;
+            Capture = capture;
+            Check = check;
+            Checkmate = checkmate;
+            ShortCastle = shortCastle;
+            LongCastle = longCastle;
+        }
+
+        public override string ToString()
+        {
+            string notation = ChessPieceAbbr[Piece] + ";" + StartField + ";" + EndField + ";";
+            if (ShortCastle)
+                notation = "0-0";
+            else if(LongCastle)
+                notation = "0-0-0";
+            else if (Capture)
+                notation = ChessPieceAbbr[Piece] + ";" + StartField + ";" + "x" + ";" + EndField + ";";
+            if (Check && !Checkmate)
+                notation += "+";
+            if (Checkmate)
+                notation += "#";
+            notation = notation.Replace(";", "");
+            return notation;
         }
     }
     #endregion

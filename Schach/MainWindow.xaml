@@ -232,5 +232,6 @@
         <Border BorderBrush="Black" BorderThickness="2" Grid.Column="7" Grid.Row="7" Background="Beige" Name="H1" MouseLeftButtonDown="Common_MouseLeftButtonDown">
             <TextBlock Text="&#x2656;" FontFamily="{StaticResource ChessFont}" FontSize="90" HorizontalAlignment="Center" VerticalAlignment="Top"/>
         </Border>
+        <ListView Grid.Column="8" Grid.RowSpan="8" Name="Notations_lv"></ListView>
     </Grid>
 </Window>
