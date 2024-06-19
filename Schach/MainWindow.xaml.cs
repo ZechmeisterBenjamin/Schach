@@ -244,6 +244,7 @@ namespace Schach
         }
         private bool IsCheckmate(Move move)
         {
+            bool checkmate = true;
             var children = GetAllChildren(ChessBoard);
             List<string> chessFieldsName = new List<string>();
             List<object> chessFields = new List<object>();
@@ -274,19 +275,20 @@ namespace Schach
                     }
                 }
             }
-            for (int i = 0; i < moves.Count; i++)
+            for(int i = 0; i < moves.Count; i++)
             {
-                for (int j = 0; j < moves[i].Count; j++)
+                for(int j = 0; j < moves[i].Count; j++)
                 {
-                    int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(moves[i][j].endField)));
-                    int indexColumn = chessBoard[indexRow].IndexOf(moves[i][j].endField);
-                    if (IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]) != null)
-                        if (IsCheck(moves[i][j]))
-                                return true;
+                    MoveChessPiece(moves[i][j]);
+                    if (!IsChecked(moves[i][j]))
+                        checkmate = false;
+                    ReverseMove(moves[i][j]);
+                    if (!checkmate)
+                        return checkmate;
                 }
             }
             selectedField = oldSelectedField;
-            return false;
+            return checkmate;
         }
         private void SelectedChessField(object sender)
         {
@@ -322,6 +324,11 @@ namespace Schach
                     {
                         if(currentMove.startField != currentMove.endField)
                         {
+                            bool capture = true;
+                            int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(currentMove.endField)));
+                            int indexColumn = chessBoard[indexRow].IndexOf(currentMove.endField);
+                            if (currentChessBoard[indexRow][indexColumn] == "")
+                                capture = false;
                             MoveChessPiece(sender);
                             bool check = IsCheck(currentMove);
                             bool isInCheck = IsChecked(currentMove);
@@ -329,14 +336,16 @@ namespace Schach
                             if (isInCheck)
                             {
                                 ReverseMove(currentMove);
+                                SwitchTurn();
                             }
                             if(!isInCheck && selectedCounter == 0)
-                                notations.Add(new Notation(IdentifyChessPiece(textBlock.Text).piece, currentMove.startField, currentMove.endField, false, check, isCheckMate, false, false));
+                                notations.Add(new Notation(IdentifyChessPiece(textBlock.Text).piece, currentMove.startField, currentMove.endField, capture, check, isCheckMate, false, false));
                             if (isCheckMate)
                             {
-                                ResetChessBoard();
-                                //notations = new ObservableCollection<Notation>();
                                 MessageBox.Show(currentTurn + " won!");
+                                SwitchTurn();
+                                ResetChessBoard();
+                                notations.Clear();
                             }
                             if (currentTurn == ChessColor.White)
                             {
@@ -357,6 +366,17 @@ namespace Schach
                         }
                     }
                 }
+            }
+        }
+        private void SwitchTurn()
+        {
+            if (currentTurn == ChessColor.White)
+            {
+                currentTurn = ChessColor.Black;
+            }
+            else if (currentTurn == ChessColor.Black)
+            {
+                currentTurn = ChessColor.White;
             }
         }
         private void ResetChessBoard()
@@ -399,14 +419,6 @@ namespace Schach
                 currentChessBoard[indexRow][indexColumn] = "";
                 currentChessBoard[indexNewRow][indexNewColumn] = piece;
                 RefreshBoard();
-                if (currentTurn == ChessColor.White)
-                {
-                    currentTurn = ChessColor.Black;
-                }
-                else if (currentTurn == ChessColor.Black)
-                {
-                    currentTurn = ChessColor.White;
-                }
             }
         }
         private List<Move> GetMoves(object sender)
@@ -889,6 +901,20 @@ namespace Schach
             int indexNewRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(border.Name)));
             int indexColumn = chessBoard[indexRow].IndexOf(selectedField);
             int indexNewColumn = chessBoard[indexNewRow].IndexOf(border.Name);
+            string piece = currentChessBoard[indexRow][indexColumn];
+            if (!string.IsNullOrEmpty(piece))
+            {
+                currentChessBoard[indexRow][indexColumn] = "";
+                currentChessBoard[indexNewRow][indexNewColumn] = piece;
+                RefreshBoard();
+            }
+        }
+        private void MoveChessPiece(Move move)
+        {
+            int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.startField)));
+            int indexNewRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.endField)));
+            int indexColumn = chessBoard[indexRow].IndexOf(move.startField);
+            int indexNewColumn = chessBoard[indexNewRow].IndexOf(move.endField);
             string piece = currentChessBoard[indexRow][indexColumn];
             if (!string.IsNullOrEmpty(piece))
             {
