@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static Schach.MainWindow;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Schach
 {
@@ -248,6 +249,7 @@ namespace Schach
             var children = GetAllChildren(ChessBoard);
             List<string> chessFieldsName = new List<string>();
             List<object> chessFields = new List<object>();
+            List<List<string>> oldCurrentBoard = currentChessBoard.ToList();
             List<Piece> pieces = new List<Piece>();
             Piece checkableKing = new Piece(ChessPiece.King, ChessColor.Black);
             List<List<Move>> moves = new List<List<Move>>();
@@ -285,12 +287,16 @@ namespace Schach
                     if (notations.Count > 0)
                         ResetMoves();
                     else
-                    ReverseMove(moves[i][j]);
+                        ReverseMove(moves[i][j]);
                     if (!checkmate)
+                    {
+                        currentChessBoard = oldCurrentBoard.ToList();
                         return checkmate;
+                    }
                 }
             }
             selectedField = oldSelectedField;
+            currentChessBoard = oldCurrentBoard.ToList();
             return checkmate;
         }
 
@@ -355,7 +361,7 @@ namespace Schach
                                 SwitchTurn();
                             }
                             if(!isInCheck && selectedCounter == 0)
-                                notations.Add(new Notation(IdentifyChessPiece(textBlock.Text).piece, currentMove.startField, currentMove.endField, capture, check, isCheckMate, false, false));
+                                notations.Add(new Notation(IdentifyChessPiece(currentChessBoard[indexRow][indexColumn]).piece, currentMove.startField, currentMove.endField, capture, check, isCheckMate, false, false, currentTurn));
                             if (isCheckMate)
                             {
                                 MessageBox.Show(currentTurn + " won!");
