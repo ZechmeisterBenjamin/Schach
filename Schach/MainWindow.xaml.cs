@@ -282,6 +282,9 @@ namespace Schach
                     MoveChessPiece(moves[i][j]);
                     if (!IsChecked(moves[i][j]))
                         checkmate = false;
+                    if (notations.Count > 0)
+                        ResetMoves();
+                    else
                     ReverseMove(moves[i][j]);
                     if (!checkmate)
                         return checkmate;
@@ -290,6 +293,19 @@ namespace Schach
             selectedField = oldSelectedField;
             return checkmate;
         }
+
+        private void ResetMoves()
+        {
+            if (notations.Count == 0)
+                return;
+            ResetChessBoard();
+            for(int i = 0; i < notations.Count; i++)
+            {
+                Move move = new Move(notations[i].StartField, notations[i].EndField);
+                MoveChessPiece(move);
+            }
+        }
+
         private void SelectedChessField(object sender)
         {
             Border border = (Border)sender;
