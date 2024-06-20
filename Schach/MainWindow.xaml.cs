@@ -1042,6 +1042,7 @@ namespace Schach
             {ChessPiece.Rook, "R"},
         };
         public ChessPiece Piece { get; set; }
+        public ChessColor Color { get; set; }
         public string StartField { get; set; }
         public string EndField { get; set; }
         public bool Capture { get; set; }
@@ -1049,7 +1050,7 @@ namespace Schach
         public bool Checkmate {  get; set; }
         public bool ShortCastle {  get; set; }
         public bool LongCastle { get; set; }
-        public Notation(ChessPiece piece, string startField, string endField, bool capture, bool check, bool checkmate, bool shortCastle, bool longCastle)
+        public Notation(ChessPiece piece, string startField, string endField, bool capture, bool check, bool checkmate, bool shortCastle, bool longCastle, ChessColor color)
         {
             Piece = piece;
             StartField = startField;
@@ -1059,6 +1060,7 @@ namespace Schach
             Checkmate = checkmate;
             ShortCastle = shortCastle;
             LongCastle = longCastle;
+            Color = color;
         }
 
         public override string ToString()
