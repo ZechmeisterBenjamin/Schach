@@ -407,6 +407,62 @@ namespace Schach
             FillCurrentChessBoard();
             currentTurn = ChessColor.White;
         }
+        private string PieceToCode(Piece piece)
+        {
+            string code = "";
+            if (piece.piece == ChessPiece.Rook && piece.color == ChessColor.Black)
+                code = "&#x265C;";
+            else if (piece.piece == ChessPiece.Rook && piece.color == ChessColor.White)
+                code = "&#x2656;";
+            else if (piece.piece == ChessPiece.Knight && piece.color == ChessColor.Black)
+                code = "&#x265E;";
+            else if (piece.piece == ChessPiece.Knight && piece.color == ChessColor.White)
+                code = "&#x2658;";
+            else if (piece.piece == ChessPiece.Bishop && piece.color == ChessColor.Black)
+                code = "&#x265D;";
+            else if (piece.piece == ChessPiece.Bishop && piece.color == ChessColor.White)
+                code = "&#x2657;";
+            else if (piece.piece == ChessPiece.King && piece.color == ChessColor.Black)
+                code = "&#x265A;";
+            else if (piece.piece == ChessPiece.King && piece.color == ChessColor.White)
+                code = "&#x2654;";
+            else if (piece.piece == ChessPiece.Queen && piece.color == ChessColor.Black)
+                code = "&#x265B;";
+            else if (piece.piece == ChessPiece.Queen && piece.color == ChessColor.White)
+                code = "&#x2655;";
+            else if (piece.piece == ChessPiece.Pawn && piece.color == ChessColor.Black)
+                code = "&#x265F;";
+            else if (piece.piece == ChessPiece.Pawn && piece.color == ChessColor.White)
+                code = "&#x2659;";
+            else
+                return null;
+            string hexCode = code.Substring(3); // Remove the "&#x" prefix
+            List<byte> byteList = new List<byte>();
+
+            for (int i = hexCode.Length - 2; i >= 0; i -= 2)
+            {
+                string hexByte = hexCode.Substring(i, 2);
+                byteList.Add(Convert.ToByte(hexByte, 16));
+            }
+
+            byte[] bytes = byteList.ToArray();
+            Array.Reverse(bytes); // Reverse the byte array to match the original order
+            return Encoding.Unicode.GetString(bytes);
+        }
+        private void ReverseMove(Notation notation)
+        {
+            int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(notation.EndField)));
+            int indexColumn = chessBoard[indexRow].IndexOf(notation.EndField);
+            int indexNewRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(notation.StartField)));
+            int indexNewColumn = chessBoard[indexNewRow].IndexOf(notation.StartField);
+            string piece = currentChessBoard[indexRow][indexColumn];
+            if (!string.IsNullOrEmpty(piece))
+            {
+                currentChessBoard[indexRow][indexColumn] = PieceToCode(new Piece(notation.Piece, notation.Color));
+                currentChessBoard[indexNewRow][indexNewColumn] = piece;
+                RefreshBoard();
+            }
+        }
         private void ReverseMove(Move move)
         {
             int indexRow = chessBoard.IndexOf(chessBoard.Find(x => x.Contains(move.endField)));
